@@ -53,7 +53,6 @@ class EventBridgeBroadcaster extends Broadcaster
     public function broadcast(array $channels, $event, array $payload = [])
     {
         $events = $this->mapToEventBridgeEntries($channels, $event, $payload);
-
         $result = $this->eventBridgeClient->putEvents([
             'Entries' => $events,
         ]);
@@ -75,6 +74,8 @@ class EventBridgeBroadcaster extends Broadcaster
      */
     protected function mapToEventBridgeEntries(array $channels, string $event, array $payload): array
     {
+        $this->cleanPayload($payload);
+
         return collect($channels)
             ->map(function ($channel) use ($event, $payload) {
                 return [
@@ -93,4 +94,10 @@ class EventBridgeBroadcaster extends Broadcaster
             && $result->hasKey('FailedEntryCount')
             && $result->get('FailedEntryCount') > 0;
     }
+
+    private function cleanPayload(&$payload): void
+    {
+        unset($payload['socket']);
+    }
+
 }

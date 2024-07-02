@@ -46,6 +46,7 @@ You will need to add the following connection and configure your AWS credentials
         'driver' => 'eventbridge',
         'region' => env('AWS_DEFAULT_REGION'),
         'key' => env('AWS_ACCESS_KEY_ID'),
+        'endpoint' => env('AWS_URL'),
         'secret' => env('AWS_SECRET_ACCESS_KEY'),
         'source' => env('AWS_EVENTBRIDGE_SOURCE'),
     ],
@@ -84,6 +85,7 @@ In a similar way, you will have to make sure you're implementing the `Illuminate
 ```php
 use App\Models\Order;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
+use Illuminate\Broadcasting\InteractsWithBroadcasting;
 use Illuminate\Queue\SerializesModels;
 
 class OrderShipped implements ShouldBroadcast
@@ -106,6 +108,7 @@ class OrderShipped implements ShouldBroadcast
     public function __construct(Order $order)
     {
         $this->order = $order;
+        $this->broadcastVia('eventbridge');
     }
 
     /**
@@ -115,7 +118,7 @@ class OrderShipped implements ShouldBroadcast
      */
     public function broadcastOn()
     {
-        return ['orders']; // This is the Topic name for the ARN 'arn:aws:sns:us-east-1:123456789:orders' for example
+        return ['orders']; // This is the Event bus name
     }
 }
 ```
@@ -136,42 +139,10 @@ By default, the package will publish the default Laravel payload which is alread
     "connection": null,
     "queue": null
 }
+
 ```
 
-By default, Laravel will automatically add any additional public property to the payload:
-
-```php
-use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
-use Illuminate\Queue\SerializesModels;
-
-class OrderShipped implements ShouldBroadcast
-{
-    use SerializesModels;
-
-    public $action = 'parcel_handled';
-
-    // ...
-}
-```
-
-Which would produce the following payload:
-
-```json
-{
-    "action": "parcel_handled",
-    "order": {
-        "id": 1,
-        "name": "Some Goods",
-        "total": 123456,
-        "created_at": "2021-06-29T13:21:36.000000Z",
-        "updated_at": "2021-06-29T13:21:36.000000Z"
-    },
-    "connection": null,
-    "queue": null
-}
-```
-
-However, using the `broadcastWith` method, you will be able to define exactly what kind of payload gets published.
+Using the `broadcastWith` method, you will be able to define exactly what kind of payload gets published.
 
 ```php
 /**

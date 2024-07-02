@@ -28,15 +28,6 @@ class EventBridgeBroadcasterServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    protected function registerSqsSnsQueueConnector()
-    {
-        $this->app->resolving('queue', function (QueueManager $manager) {
-            $manager->extend('sqs-sns', function () {
-                return new SqsSnsConnector;
-            });
-        });
-    }
-
     /**
      * Register the EventBridge broadcaster for the Broadcast components.
      *
@@ -60,7 +51,6 @@ class EventBridgeBroadcasterServiceProvider extends ServiceProvider
     public function createEventBridgeDriver(array $config)
     {
         $config = self::prepareConfigurationCredentials($config);
-
         return new EventBridgeBroadcaster(
             new EventBridgeClient(array_merge($config, ['version' => '2015-10-07'])),
             $config['source'] ?? '',
