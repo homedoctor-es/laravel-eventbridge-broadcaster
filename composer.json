@@ -1,8 +1,8 @@
 {
-    "name": "homedoctor-es/laravel-eventbridge-broadcaste",
+    "name": "homedoctor-es/laravel-eventbridge-broadcaster",
     "description": "A Laravel broadcasting driver to publish events to EventBridge.",
     "keywords": ["laravel", "broadcasting", "broadcast", "queue", "listeners", "pubsub", "aws", "sns", "sqs"],
-    "homepage": "https://github.com/homedoctor-es/laravel-eventbridge-broadcaste",
+    "homepage": "https://github.com/homedoctor-es/laravel-eventbridge-broadcaster",
     "license": "MIT",
     "authors": [
         {
